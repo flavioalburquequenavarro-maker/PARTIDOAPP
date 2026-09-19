@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Crear partido</title>
+
+    <style>
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #f2f4f7;
+            margin: 0;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .contenedor {
+            background: white;
+            max-width: 450px;
+            margin: 60px auto;
+            padding: 30px;
+            border-radius: 18px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.12);
+        }
+
+        h1 {
+            margin-bottom: 10px;
+        }
+
+        input {
+            width: 90%;
+            padding: 14px;
+            margin: 8px 0;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+        }
+
+        button {
+            width: 96%;
+            padding: 15px;
+            margin-top: 15px;
+            font-size: 17px;
+            border: none;
+            border-radius: 10px;
+            background: #2ecc71;
+            color: white;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #27ae60;
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+    <div class="contenedor">
+
+        <h1>⚽ Crear partido</h1>
+
+        <p>Organiza tu partido y permite que tus amigos se apunten.</p>
+
+        <form action="/crear" method="POST">
+
+            <input
+                type="text"
+                name="nombre"
+                placeholder="Nombre del partido"
+                required
+            >
+
+            <br>
+
+            <input
+                type="date"
+                name="fecha"
+                required
+            >
+
+            <br>
+
+            <input
+                type="time"
+                name="hora"
+                required
+            >
+
+            <br>
+
+            <button type="submit">
+                Crear partido
+            </button>
+
+        </form>
+
+    </div>
+
+</body>
+
+</html>
