@@ -54,38 +54,12 @@ with app.app_context():
 @app.route("/")
 def inicio():
 
-    partido = Partido.query.first()
+    partido_db = Partido.query.first()
 
-    if not partido:
+    if not partido_db:
         return render_template("inicio.html")
 
-    jugadores = {
-        "partido": {
-            "nombre": partido.nombre,
-            "fecha": partido.fecha,
-            "hora": partido.hora
-        },
-        "equipo1": [
-            {
-                "id": jugador.id,
-                "nombre": jugador.nombre
-            }
-            for jugador in Jugador.query.filter_by(equipo="equipo1").all()
-        ],
-        "equipo2": [
-            {
-                "id": jugador.id,
-                "nombre": jugador.nombre
-            }
-            for jugador in Jugador.query.filter_by(equipo="equipo2").all()
-        ]
-    }
-
-    return render_template(
-        "inicio.html",
-        partido=jugadores["partido"]
-    )
-
+    return partido()
 
 @app.route("/crear", methods=["POST"])
 def crear():
