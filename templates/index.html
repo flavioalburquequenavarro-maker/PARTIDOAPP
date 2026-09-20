@@ -1,365 +1,440 @@
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
-
     <meta charset="UTF-8">
-
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>{{ jugadores.partido.nombre }}</title>
 
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+
     <style>
-
-        body {
-            font-family: Arial, sans-serif;
-            background: #f2f4f7;
-            margin: 0;
-            padding: 20px;
-            text-align: center;
-        }
-
-        .encabezado {
-            margin-bottom: 25px;
-        }
-
-        .encabezado h1 {
-            margin-bottom: 8px;
-        }
-
-        .datos-partido {
-            color: #666;
-            font-size: 16px;
-        }
-
-        .registro {
-            background: white;
-            padding: 20px;
-            border-radius: 15px;
-            max-width: 450px;
-            margin: auto;
-            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
-        }
-
-        input {
-            width: 90%;
-            padding: 14px;
-            font-size: 16px;
-            border: 1px solid #ccc;
-            border-radius: 10px;
-            margin-bottom: 15px;
+        * {
             box-sizing: border-box;
-        }
-
-        .botones {
-            display: flex;
-            gap: 10px;
-        }
-
-        button {
-            flex: 1;
-            padding: 14px;
-            font-size: 16px;
-            border: none;
-            border-radius: 10px;
-            cursor: pointer;
-        }
-
-        button:disabled {
-            background: #999;
-            cursor: not-allowed;
-        }
-
-        .equipo1 {
-            background: #3498db;
-            color: white;
-        }
-
-        .equipo2 {
-            background: #e74c3c;
-            color: white;
-        }
-
-        .equipos {
-            display: flex;
-            gap: 20px;
-            max-width: 800px;
-            margin: 30px auto;
-        }
-
-        .tarjeta {
-            background: white;
-            flex: 1;
-            padding: 20px;
-            border-radius: 15px;
-            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
-        }
-
-        .tarjeta h2 {
-            margin-top: 0;
-        }
-
-        .contador {
-            color: #666;
-        }
-
-        ul {
-            list-style: none;
+            margin: 0;
             padding: 0;
         }
 
-        li {
-            background: #f2f4f7;
-            margin: 8px 0;
-            padding: 10px;
-            border-radius: 8px;
+       body {
+    font-family: "Poppins", sans-serif;
+    min-height: 100vh;
+    background:
+        linear-gradient(rgba(5, 10, 20, 0.62), rgba(5, 10, 20, 0.62)),
+        url("/static/WhatsApp%20Image%202026-09-19%20at%208.39.24%20PM.jpeg");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    color: #ffffff;
+    padding: 20px;
+}
+        .container {
+            width: 100%;
+            max-width: 900px;
+            margin: 0 auto;
         }
 
-        .salir {
-            background: #ddd;
-            color: #333;
-            padding: 6px 10px;
+        .header {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .match-info {
+            color: #b8c2d1;
+            font-size: 14px;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.07);
+            border: 1px solid rgba(255, 255, 255, 0.10);
+            border-radius: 20px;
+            padding: 22px;
+            margin-bottom: 20px;
+            backdrop-filter: blur(12px);
+        }
+
+        .card h2 {
+            font-size: 18px;
+            margin-bottom: 18px;
+            font-weight: 600;
+        }
+
+        .teams {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 18px;
+            margin-bottom: 20px;
+        }
+
+        .team {
+            background: rgba(255, 255, 255, 0.06);
+            border-radius: 18px;
+            padding: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.09);
+        }
+
+        .team h2 {
+            margin-bottom: 15px;
+            font-size: 19px;
+        }
+
+        .team1 h2 {
+    color: #60a5fa;
+}
+
+.team2 h2 {
+    color: #60a5fa;
+}
+        .player {
+            background: rgba(255, 255, 255, 0.07);
+            border-radius: 10px;
+            padding: 11px 13px;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .empty {
+            color: #8e99aa;
             font-size: 13px;
-            margin-left: 8px;
         }
 
-        .mensaje {
-            color: #e74c3c;
-            font-weight: bold;
+        .count {
+            color: #aeb8c8;
+            font-size: 13px;
+            margin-bottom: 14px;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        label {
+            display: block;
+            font-size: 14px;
+            margin-bottom: 7px;
+            color: #d6dce5;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 14px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            background: rgba(255, 255, 255, 0.08);
+            color: white;
+            font-family: "Poppins", sans-serif;
+            font-size: 15px;
+            outline: none;
+        }
+
+        input[type="text"]:focus {
+            border-color: #60a5fa;
+        }
+
+        input[type="text"]::placeholder {
+            color: #8994a5;
+        }
+
+        .team-options {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .team-option input {
+            display: none;
+        }
+
+        .team-option label {
+            cursor: pointer;
+            text-align: center;
+            padding: 13px 10px;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.07);
+            border: 1px solid rgba(255, 255, 255, 0.10);
+            transition: 0.2s;
+        }
+
+        .team-option input:checked + label {
+            background: rgba(96, 165, 250, 0.20);
+            border-color: #60a5fa;
+            color: #ffffff;
+        }
+
+        .button {
+            width: 100%;
+            border: none;
+            border-radius: 12px;
+            padding: 14px;
+            font-family: "Poppins", sans-serif;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .button-primary {
+            background: #2563eb;
+            color: white;
+        }
+
+        .button-primary:hover {
+            background: #1d4ed8;
+        }
+
+        .button-danger {
+            background: rgba(239, 68, 68, 0.15);
+            color: #fca5a5;
+            border: 1px solid rgba(239, 68, 68, 0.25);
+        }
+
+        .button-danger:hover {
+            background: rgba(239, 68, 68, 0.25);
+        }
+
+        .message {
+            background: rgba(245, 158, 11, 0.12);
+            border: 1px solid rgba(245, 158, 11, 0.25);
+            color: #fcd34d;
+            padding: 13px;
+            border-radius: 12px;
+            margin-bottom: 18px;
+            font-size: 14px;
+            text-align: center;
+        }
+
+        .footer {
+            text-align: center;
+            color: #697586;
+            font-size: 12px;
+            margin-top: 25px;
         }
 
         @media (max-width: 600px) {
 
-            .equipos {
-                flex-direction: column;
+            body {
+                padding: 14px;
             }
 
-            .botones {
-                flex-direction: column;
+            .header h1 {
+                font-size: 23px;
             }
 
+            .card {
+                padding: 17px;
+                border-radius: 17px;
+            }
+
+            .teams {
+                grid-template-columns: 1fr;
+                gap: 12px;
+            }
+
+            .team {
+                padding: 16px;
+            }
+
+            .team h2 {
+                font-size: 17px;
+            }
+
+            .team-options {
+                grid-template-columns: 1fr 1fr;
+            }
         }
-
     </style>
-
 </head>
 
 <body>
 
-    <!-- ENCABEZADO DEL PARTIDO -->
+    <div class="container">
 
-    <div class="encabezado">
+        <header class="header">
+            <h1>{{ jugadores.partido.nombre }}</h1>
 
-        <h1>⚽ {{ jugadores.partido.nombre }}</h1>
-
-        <div class="datos-partido">
-
-            <p>
-                📅 {{ jugadores.partido.fecha }}
-                &nbsp;&nbsp;
-                🕐 {{ jugadores.partido.hora }}
+            <p class="match-info">
+                {{ jugadores.partido.fecha }} · {{ jugadores.partido.hora }}
             </p>
-
-        </div>
-
-    </div>
+        </header>
 
 
-    <!-- MENSAJE -->
-
-    {% if mensaje %}
-
-        <p class="mensaje">
-            {{ mensaje }}
-        </p>
-
-    {% endif %}
-
-
-    <!-- FORMULARIO -->
-
-    <div class="registro">
-
-        <h2>Apúntate al partido</h2>
-
-        <form action="/agregar" method="POST">
-
-            <input
-                type="text"
-                name="nombre"
-                placeholder="Escribe tu nombre"
-                required
-            >
-
-            <div class="botones">
-
-                <button
-                    class="equipo1"
-                    type="submit"
-                    name="equipo"
-                    value="equipo1"
-                    {% if jugadores.equipo1|length >= 4 %}disabled{% endif %}
-                >
-
-                    {% if jugadores.equipo1|length >= 4 %}
-                        Equipo 1 lleno
-                    {% else %}
-                        Equipo 1
-                    {% endif %}
-
-                </button>
-
-
-                <button
-                    class="equipo2"
-                    type="submit"
-                    name="equipo"
-                    value="equipo2"
-                    {% if jugadores.equipo2|length >= 4 %}disabled{% endif %}
-                >
-
-                    {% if jugadores.equipo2|length >= 4 %}
-                        Equipo 2 lleno
-                    {% else %}
-                        Equipo 2
-                    {% endif %}
-
-                </button>
-
+        {% if mensaje %}
+            <div class="message">
+                {{ mensaje }}
             </div>
-
-        </form>
-
-    </div>
+        {% endif %}
 
 
-    <!-- EQUIPOS -->
+        <div class="teams">
 
-    <div class="equipos">
+            <section class="team team1">
 
+                <h2>Equipo 1</h2>
 
-        <!-- EQUIPO 1 -->
+                <p class="count">
+                    {{ jugadores.equipo1|length }} / 4 jugadores
+                </p>
 
-        <div class="tarjeta">
+                {% if jugadores.equipo1 %}
 
-            <h2>Equipo 1</h2>
-
-            <p class="contador">
-                {{ jugadores.equipo1|length }}/4 jugadores
-            </p>
-
-            <p>
-
-                {% if jugadores.equipo1|length < 4 %}
-
-                    {{ 4 - jugadores.equipo1|length }} cupos disponibles
+                    {% for jugador in jugadores.equipo1 %}
+                        <div class="player">
+                            {{ jugador.nombre }}
+                        </div>
+                    {% endfor %}
 
                 {% else %}
 
-                    Equipo lleno
+                    <p class="empty">
+                        Todavía no hay jugadores.
+                    </p>
 
                 {% endif %}
 
-            </p>
+            </section>
 
-            <ul>
 
-                {% for jugador in jugadores.equipo1 %}
+            <section class="team team2">
 
-                    <li>
+                <h2>Equipo 2</h2>
 
-                        {{ jugador.nombre }}
+                <p class="count">
+                    {{ jugadores.equipo2|length }} / 4 jugadores
+                </p>
 
-                        {% if session.jugador_id == jugador.id %}
+                {% if jugadores.equipo2 %}
 
-                            <form
-                                action="/salir"
-                                method="POST"
-                                style="display:inline;"
-                            >
+                    {% for jugador in jugadores.equipo2 %}
+                        <div class="player">
+                            {{ jugador.nombre }}
+                        </div>
+                    {% endfor %}
 
-                                <button
-                                    class="salir"
-                                    type="submit"
-                                >
-                                    Salir
-                                </button>
+                {% else %}
 
-                            </form>
+                    <p class="empty">
+                        Todavía no hay jugadores.
+                    </p>
 
-                        {% endif %}
+                {% endif %}
 
-                    </li>
-
-                {% endfor %}
-
-            </ul>
+            </section>
 
         </div>
 
 
-        <!-- EQUIPO 2 -->
+        <section class="card">
 
-        <div class="tarjeta">
+            <h2>Apuntarse al partido</h2>
 
-            <h2>Equipo 2</h2>
+            <form action="/agregar" method="POST">
 
-            <p class="contador">
-                {{ jugadores.equipo2|length }}/4 jugadores
-            </p>
+                <div class="form-group">
 
-            <p>
+                    <label for="nombre">
+                        Tu nombre
+                    </label>
 
-                {% if jugadores.equipo2|length < 4 %}
+                    <input
+                        type="text"
+                        id="nombre"
+                        name="nombre"
+                        placeholder="Escribe tu nombre"
+                        maxlength="100"
+                        required
+                    >
 
-                    {{ 4 - jugadores.equipo2|length }} cupos disponibles
+                </div>
 
-                {% else %}
 
-                    Equipo lleno
+                <div class="form-group">
 
-                {% endif %}
+                    <label>
+                        Elige tu equipo
+                    </label>
 
-            </p>
+                    <div class="team-options">
 
-            <ul>
+                        <div class="team-option">
 
-                {% for jugador in jugadores.equipo2 %}
-
-                    <li>
-
-                        {{ jugador.nombre }}
-
-                        {% if session.jugador_id == jugador.id %}
-
-                            <form
-                                action="/salir"
-                                method="POST"
-                                style="display:inline;"
+                            <input
+                                type="radio"
+                                id="equipo1"
+                                name="equipo"
+                                value="equipo1"
+                                required
                             >
 
-                                <button
-                                    class="salir"
-                                    type="submit"
-                                >
-                                    Salir
-                                </button>
+                            <label for="equipo1">
+                                Equipo 1
+                            </label>
 
-                            </form>
+                        </div>
 
-                        {% endif %}
 
-                    </li>
+                        <div class="team-option">
 
-                {% endfor %}
+                            <input
+                                type="radio"
+                                id="equipo2"
+                                name="equipo"
+                                value="equipo2"
+                                required
+                            >
 
-            </ul>
+                            <label for="equipo2">
+                                Equipo 2
+                            </label>
 
-        </div>
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <button
+                    type="submit"
+                    class="button button-primary"
+                >
+                    Apuntarme
+                </button>
+
+            </form>
+
+        </section>
+
+
+        <section class="card">
+
+            <h2>Tu inscripción</h2>
+
+            <form action="/salir" method="POST">
+
+                <button
+                    type="submit"
+                    class="button button-danger"
+                >
+                    Salir del partido
+                </button>
+
+            </form>
+
+        </section>
+
+
+        <footer class="footer">
+            PARTIDOAPP
+        </footer>
 
     </div>
-
 
 </body>
-
 </html>
