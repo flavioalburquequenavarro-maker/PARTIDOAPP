@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, session
+from flask import Flask, render_template, request, session, redirect
 from flask_sqlalchemy import SQLAlchemy
 import uuid
 import os
@@ -233,6 +233,30 @@ def salir():
 
     return partido()
 
+@app.route("/eliminar", methods=["POST"])
+def eliminar():
+
+    password = request.form.get("password", "")
+    admin_password = os.environ.get("ADMIN_PASSWORD")
+
+    if not admin_password:
+        return partido_con_mensaje(
+            "La contraseña de administrador no está configurada."
+        )
+
+    if password != admin_password:
+        return partido_con_mensaje(
+            "Contraseña incorrecta."
+        )
+
+    Jugador.query.delete()
+    Partido.query.delete()
+
+    db.session.commit()
+
+    session.pop("jugador_id", None)
+
+    return redirect("/")
 
 def partido_con_mensaje(mensaje):
 

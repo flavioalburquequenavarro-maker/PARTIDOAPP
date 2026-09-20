@@ -428,8 +428,38 @@
             </form>
 
         </section>
+<section class="card">
 
+    <h2>Administración</h2>
 
+    <form action="/eliminar" method="POST">
+
+        <div class="form-group">
+
+            <label for="password">
+                Contraseña de administrador
+            </label>
+
+            <input
+                type="password"
+                id="password"
+                name="password"
+                placeholder="Ingresa la contraseña"
+                required
+            >
+
+        </div>
+
+        <button
+            type="submit"
+            class="button button-danger"
+        >
+            Eliminar partido
+        </button>
+
+    </form>
+
+</section>
         <footer class="footer">
             PARTIDOAPP
         </footer>
