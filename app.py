@@ -1,25 +1,85 @@
-from flask import Flask, render_template, request
-import json
+from flask import Flask, render_template, request, session
+from flask_sqlalchemy import SQLAlchemy
+import uuid
+import os
 
 app = Flask(__name__)
 
-ARCHIVO = "jugadores.json"
+# Clave secreta
+app.secret_key = os.environ.get(
+    "SECRET_KEY",
+    "clave-partidoapp-2026"
+)
+
+# Base de datos
+database_url = os.environ.get(
+    "DATABASE_URL",
+    "sqlite:///partido.db"
+)
+
+# Compatibilidad con algunas URLs de PostgreSQL
+if database_url.startswith("postgres://"):
+    database_url = database_url.replace(
+        "postgres://",
+        "postgresql://",
+        1
+    )
+
+app.config["SQLALCHEMY_DATABASE_URI"] = database_url
+app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+
+db = SQLAlchemy(app)
 MAX_JUGADORES = 4
 
 
-def cargar_jugadores():
-    with open(ARCHIVO, "r", encoding="utf-8") as archivo:
-        return json.load(archivo)
+class Partido(db.Model):
+
+    id = db.Column(db.Integer, primary_key=True)
+    nombre = db.Column(db.String(100), nullable=False)
+    fecha = db.Column(db.String(20), nullable=False)
+    hora = db.Column(db.String(20), nullable=False)
 
 
-def guardar_jugadores(jugadores):
-    with open(ARCHIVO, "w", encoding="utf-8") as archivo:
-        json.dump(jugadores, archivo, ensure_ascii=False, indent=4)
+class Jugador(db.Model):
+
+    id = db.Column(db.String(36), primary_key=True)
+    nombre = db.Column(db.String(100), nullable=False)
+    equipo = db.Column(db.String(20), nullable=False)
+
+
+with app.app_context():
+    db.create_all()
 
 
 @app.route("/")
 def inicio():
-    jugadores = cargar_jugadores()
+
+    partido = Partido.query.first()
+
+    if not partido:
+        return render_template("inicio.html")
+
+    jugadores = {
+        "partido": {
+            "nombre": partido.nombre,
+            "fecha": partido.fecha,
+            "hora": partido.hora
+        },
+        "equipo1": [
+            {
+                "id": jugador.id,
+                "nombre": jugador.nombre
+            }
+            for jugador in Jugador.query.filter_by(equipo="equipo1").all()
+        ],
+        "equipo2": [
+            {
+                "id": jugador.id,
+                "nombre": jugador.nombre
+            }
+            for jugador in Jugador.query.filter_by(equipo="equipo2").all()
+        ]
+    }
 
     return render_template(
         "inicio.html",
@@ -34,16 +94,35 @@ def crear():
     fecha = request.form["fecha"]
     hora = request.form["hora"]
 
-    jugadores = cargar_jugadores()
+    Jugador.query.delete()
 
-    jugadores["partido"]["nombre"] = nombre
-    jugadores["partido"]["fecha"] = fecha
-    jugadores["partido"]["hora"] = hora
+    partido = Partido.query.first()
 
-    jugadores["equipo1"] = []
-    jugadores["equipo2"] = []
+    if partido:
+        partido.nombre = nombre
+        partido.fecha = fecha
+        partido.hora = hora
+    else:
+        partido = Partido(
+            nombre=nombre,
+            fecha=fecha,
+            hora=hora
+        )
+        db.session.add(partido)
 
-    guardar_jugadores(jugadores)
+    db.session.commit()
+
+    jugadores = {
+        "partido": {
+            "nombre": nombre,
+            "fecha": fecha,
+            "hora": hora
+        },
+        "equipo1": [],
+        "equipo2": []
+    }
+
+    session.pop("jugador_id", None)
 
     return render_template(
         "index.html",
@@ -54,7 +133,33 @@ def crear():
 @app.route("/partido")
 def partido():
 
-    jugadores = cargar_jugadores()
+    partido = Partido.query.first()
+
+    jugadores = {
+        "partido": {
+            "nombre": partido.nombre,
+            "fecha": partido.fecha,
+            "hora": partido.hora
+        },
+        "equipo1": [],
+        "equipo2": []
+    }
+
+    jugadores["equipo1"] = [
+        {
+            "id": jugador.id,
+            "nombre": jugador.nombre
+        }
+        for jugador in Jugador.query.filter_by(equipo="equipo1").all()
+    ]
+
+    jugadores["equipo2"] = [
+        {
+            "id": jugador.id,
+            "nombre": jugador.nombre
+        }
+        for jugador in Jugador.query.filter_by(equipo="equipo2").all()
+    ]
 
     return render_template(
         "index.html",
@@ -68,66 +173,133 @@ def agregar():
     nombre = request.form["nombre"].strip()
     equipo = request.form["equipo"]
 
-    jugadores = cargar_jugadores()
-
     if nombre == "":
-        return render_template(
-            "index.html",
-            jugadores=jugadores,
-            mensaje="Escribe tu nombre."
+        return partido_con_mensaje("Escribe tu nombre.")
+
+    # Evitar que el mismo navegador se registre dos veces
+    jugador_id_actual = session.get("jugador_id")
+
+    if jugador_id_actual:
+
+        jugador_actual = db.session.get(
+            Jugador,
+            jugador_id_actual
         )
 
-    todos_los_jugadores = (
-        jugadores["equipo1"] +
-        jugadores["equipo2"]
+        if jugador_actual:
+
+            return partido_con_mensaje(
+                "Ya estás apuntado. Sal primero si quieres cambiar de equipo."
+            )
+
+    # Comprobar nombre repetido
+    jugadores_existentes = Jugador.query.all()
+
+    for jugador in jugadores_existentes:
+
+        if jugador.nombre.lower() == nombre.lower():
+
+            return partido_con_mensaje(
+                "Ese nombre ya está registrado."
+            )
+
+    # Comprobar máximo de jugadores
+    cantidad = Jugador.query.filter_by(
+        equipo=equipo
+    ).count()
+
+    if cantidad >= MAX_JUGADORES:
+
+        return partido_con_mensaje(
+            "Ese equipo ya está lleno. Máximo 4 jugadores."
+        )
+
+    jugador_id = str(uuid.uuid4())
+
+    jugador = Jugador(
+        id=jugador_id,
+        nombre=nombre,
+        equipo=equipo
     )
 
-    if nombre.lower() in [
-        jugador.lower()
-        for jugador in todos_los_jugadores
-    ]:
-        return render_template(
-            "index.html",
-            jugadores=jugadores,
-            mensaje="Ese nombre ya está registrado."
-        )
+    db.session.add(jugador)
+    db.session.commit()
 
-    if len(jugadores[equipo]) >= MAX_JUGADORES:
-        return render_template(
-            "index.html",
-            jugadores=jugadores,
-            mensaje="Ese equipo ya está lleno. Máximo 4 jugadores."
-        )
+    session["jugador_id"] = jugador_id
 
-    jugadores[equipo].append(nombre)
-
-    guardar_jugadores(jugadores)
-
-    return render_template(
-        "index.html",
-        jugadores=jugadores
-    )
+    return partido()
 
 
 @app.route("/salir", methods=["POST"])
 def salir():
 
-    nombre = request.form["nombre"]
+    jugador_id = session.get("jugador_id")
 
-    jugadores = cargar_jugadores()
+    if not jugador_id:
 
-    for equipo in ["equipo1", "equipo2"]:
+        return partido_con_mensaje(
+            "No se pudo identificar tu jugador."
+        )
 
-        if nombre in jugadores[equipo]:
-            jugadores[equipo].remove(nombre)
+    jugador = db.session.get(
+        Jugador,
+        jugador_id
+    )
 
-    guardar_jugadores(jugadores)
+    if not jugador:
+
+        return partido_con_mensaje(
+            "No se encontró tu jugador."
+        )
+
+    db.session.delete(jugador)
+    db.session.commit()
+
+    session.pop("jugador_id", None)
+
+    return partido()
+
+
+def partido_con_mensaje(mensaje):
+
+    partido = Partido.query.first()
+
+    jugadores = {
+        "partido": {
+            "nombre": partido.nombre,
+            "fecha": partido.fecha,
+            "hora": partido.hora
+        },
+        "equipo1": [],
+        "equipo2": []
+    }
+
+    jugadores["equipo1"] = [
+        {
+            "id": jugador.id,
+            "nombre": jugador.nombre
+        }
+        for jugador in Jugador.query.filter_by(equipo="equipo1").all()
+    ]
+
+    jugadores["equipo2"] = [
+        {
+            "id": jugador.id,
+            "nombre": jugador.nombre
+        }
+        for jugador in Jugador.query.filter_by(equipo="equipo2").all()
+    ]
 
     return render_template(
         "index.html",
-        jugadores=jugadores
+        jugadores=jugadores,
+        mensaje=mensaje
     )
 
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000, debug=True)
+    app.run(
+        host="0.0.0.0",
+        port=5000,
+        debug=True
+    )

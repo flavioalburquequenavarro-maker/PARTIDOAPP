@@ -64,10 +64,12 @@
             border-radius: 10px;
             cursor: pointer;
         }
-button:disabled {
-    background: #999;
-    cursor: not-allowed;
-}
+
+        button:disabled {
+            background: #999;
+            cursor: not-allowed;
+        }
+
         .equipo1 {
             background: #3498db;
             color: white;
@@ -163,7 +165,7 @@ button:disabled {
     </div>
 
 
-    <!-- MENSAJE DE ERROR -->
+    <!-- MENSAJE -->
 
     {% if mensaje %}
 
@@ -174,7 +176,7 @@ button:disabled {
     {% endif %}
 
 
-    <!-- FORMULARIO PARA APUNTARSE -->
+    <!-- FORMULARIO -->
 
     <div class="registro">
 
@@ -188,41 +190,44 @@ button:disabled {
                 placeholder="Escribe tu nombre"
                 required
             >
-<div class="botones">
 
-    <button
-        class="equipo1"
-        type="submit"
-        name="equipo"
-        value="equipo1"
-        {% if jugadores.equipo1|length >= 4 %}disabled{% endif %}>
+            <div class="botones">
 
-        {% if jugadores.equipo1|length >= 4 %}
-            Equipo 1 lleno
-        {% else %}
-            Equipo 1
-        {% endif %}
+                <button
+                    class="equipo1"
+                    type="submit"
+                    name="equipo"
+                    value="equipo1"
+                    {% if jugadores.equipo1|length >= 4 %}disabled{% endif %}
+                >
 
-    </button>
+                    {% if jugadores.equipo1|length >= 4 %}
+                        Equipo 1 lleno
+                    {% else %}
+                        Equipo 1
+                    {% endif %}
+
+                </button>
 
 
-    <button
-        class="equipo2"
-        type="submit"
-        name="equipo"
-        value="equipo2"
-        {% if jugadores.equipo2|length >= 4 %}disabled{% endif %}>
+                <button
+                    class="equipo2"
+                    type="submit"
+                    name="equipo"
+                    value="equipo2"
+                    {% if jugadores.equipo2|length >= 4 %}disabled{% endif %}
+                >
 
-        {% if jugadores.equipo2|length >= 4 %}
-            Equipo 2 lleno
-        {% else %}
-            Equipo 2
-        {% endif %}
+                    {% if jugadores.equipo2|length >= 4 %}
+                        Equipo 2 lleno
+                    {% else %}
+                        Equipo 2
+                    {% endif %}
 
-    </button>
+                </button>
 
-</div>
-            
+            </div>
+
         </form>
 
     </div>
@@ -232,6 +237,7 @@ button:disabled {
 
     <div class="equipos">
 
+
         <!-- EQUIPO 1 -->
 
         <div class="tarjeta">
@@ -239,44 +245,49 @@ button:disabled {
             <h2>Equipo 1</h2>
 
             <p class="contador">
-    {{ jugadores.equipo1|length }}/4 jugadores
-</p>
+                {{ jugadores.equipo1|length }}/4 jugadores
+            </p>
 
-<p>
-    {% if jugadores.equipo1|length < 4 %}
-        {{ 4 - jugadores.equipo1|length }} cupos disponibles
-    {% else %}
-        Equipo lleno
-    {% endif %}
-</p>
+            <p>
+
+                {% if jugadores.equipo1|length < 4 %}
+
+                    {{ 4 - jugadores.equipo1|length }} cupos disponibles
+
+                {% else %}
+
+                    Equipo lleno
+
+                {% endif %}
+
+            </p>
+
             <ul>
 
                 {% for jugador in jugadores.equipo1 %}
 
                     <li>
 
-                        {{ jugador }}
+                        {{ jugador.nombre }}
 
-                        <form
-                            action="/salir"
-                            method="POST"
-                            style="display:inline;"
-                        >
+                        {% if session.jugador_id == jugador.id %}
 
-                            <input
-                                type="hidden"
-                                name="nombre"
-                                value="{{ jugador }}"
+                            <form
+                                action="/salir"
+                                method="POST"
+                                style="display:inline;"
                             >
 
-                            <button
-                                class="salir"
-                                type="submit"
-                            >
-                                Salir
-                            </button>
+                                <button
+                                    class="salir"
+                                    type="submit"
+                                >
+                                    Salir
+                                </button>
 
-                        </form>
+                            </form>
+
+                        {% endif %}
 
                     </li>
 
@@ -293,52 +304,50 @@ button:disabled {
 
             <h2>Equipo 2</h2>
 
-           <p class="contador">
-    {{ jugadores.equipo2|length }}/4 jugadores
-</p>
+            <p class="contador">
+                {{ jugadores.equipo2|length }}/4 jugadores
+            </p>
 
-<p>
-    {% if jugadores.equipo2|length < 4 %}
-        {{ 4 - jugadores.equipo2|length }} cupos disponibles
-    {% else %}
-        Equipo lleno
-    {% endif %}
-</p>
+            <p>
+
+                {% if jugadores.equipo2|length < 4 %}
+
+                    {{ 4 - jugadores.equipo2|length }} cupos disponibles
+
+                {% else %}
+
+                    Equipo lleno
+
+                {% endif %}
+
+            </p>
+
             <ul>
 
                 {% for jugador in jugadores.equipo2 %}
 
                     <li>
 
-                        {{ jugador }}
+                        {{ jugador.nombre }}
 
-                        <form
-                            action="/salir"
-                            method="POST"
-                            style="display:inline;"
-                        >
+                        {% if session.jugador_id == jugador.id %}
 
-                            <input
-                                type="hidden"
-                                name="nombre"
-                                value="{{ jugador }}"
+                            <form
+                                action="/salir"
+                                method="POST"
+                                style="display:inline;"
                             >
 
-                            <button
-    class="equipo2"
-    type="submit"
-    name="equipo"
-    value="equipo2"
-    {% if jugadores.equipo2|length >= 4 %}disabled{% endif %}>
+                                <button
+                                    class="salir"
+                                    type="submit"
+                                >
+                                    Salir
+                                </button>
 
-    {% if jugadores.equipo2|length >= 4 %}
-        Equipo 2 lleno
-    {% else %}
-        Equipo 2
-    {% endif %}
+                            </form>
 
-</button>
-                        </form>
+                        {% endif %}
 
                     </li>
 
@@ -349,6 +358,7 @@ button:disabled {
         </div>
 
     </div>
+
 
 </body>
 
